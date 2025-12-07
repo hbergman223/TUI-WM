@@ -1,6 +1,13 @@
 ## TUI-WM
 
-TUI-WM is a Lua-based terminal WM (not like tmux or GNU's screen) that can use simple graphics such as boxes, circles, and lines.
+TUI-WM is a Lua-based **window management engine** for building terminal user interfaces. Think of it as a 2D graphics layer for text mode. It handles layered rendering, sub-windows, and visual primitives like boxes, circles, and lines.
+
+Unlike terminal multiplexers (tmux/screen), TUI-WM is a **rendering library** for creating windowed applications *within* your terminal.
+
+## Requirements
+
+- Lua 5.1+
+- LuaSocket
 
 ## In action
 
