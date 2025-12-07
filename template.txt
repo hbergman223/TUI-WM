@@ -1,0 +1,114 @@
+====================================================================
+                 LUA WINDOW ENGINE (LWE) REFERENCE v6
+====================================================================
+
+This reference shows how to use the Lua Window Engine (LWE) v6.
+It supports layered rendering, sub-windows, animation, and
+double-buffered terminal output.
+
+--------------------------------------------------------------------
+INSTRUCTIONS:
+
+1. Create a new window:
+   local engine = require("window")
+   local win = engine.newWindow("main", width, height)
+   - width and height are in characters
+   Example:
+     local win = engine.newWindow("main", 80, 20)
+
+2. Add layers to the window:
+   local bg = win:addLayer("Background", zIndex)   -- lower zIndex drawn first
+   local fg = win:addLayer("Foreground", zIndex)   -- higher zIndex drawn on top
+   - zIndex determines render order (0 = default)
+
+3. Add text to a layer:
+   layer:addText(row, col, "Your text here", align)
+   - Supports multi-line text using "\n"
+   - align can be "left" (default), "center", or "right"
+   - Example:
+       bg:addText(1, 1, "Welcome to LWE!\nLine 2", "center")
+
+4. Add graphics to a layer:
+   layer:addGraphic(shape, params)
+   - Supported shapes: "box", "circle", "line"
+   - Params table example:
+       Box:    {x=1, y=3, w=10, h=5, char="#", transparent=false}
+       Circle: {x=5, y=5, radius=3, char="O", transparent=false}
+       Line:   {x1=1, y1=1, x2=10, y2=5, char="*"}
+   - transparent=true leaves existing canvas characters untouched
+   - x, y = position (top-left for box, center for circle)
+   - w, h = width & height (for boxes)
+   - radius = radius (for circles)
+   - char = character to draw
+
+5. Add sub-windows:
+   layer:addSubWindow(subWin, centerX, centerY)
+   - subWin = another window object
+   - centerX, centerY = position where sub-window is centered
+
+6. Control layer visibility:
+   layer:setVisible(true/false)
+
+7. Clear a layer:
+   layer:clear()  -- removes all text, graphics, and sub-windows
+
+8. Render your window:
+   engine.renderWindow(win)
+   - Fully repaints the window using double-buffering
+   - Cursor is automatically managed for smooth animation
+
+9. Optional: Continuous redraw for animation
+   - Use a loop to repeatedly render the window
+   - Example frame rate: 30 FPS
+   - engine.renderLoop(win, fps) will handle timing automatically
+
+--------------------------------------------------------------------
+EXAMPLE USAGE:
+
+local socket = require("socket")
+local engine = require("window")
+
+-- Create main window
+local win = engine.newWindow("Demo", 80, 24)
+
+-- Add layers
+local bg = win:addLayer("Background", 0)
+local fg = win:addLayer("Foreground", 10)
+
+-- Background: fill with dots
+bg:addGraphic("box", {x=1, y=1, w=80, h=24, char="."})
+
+-- Foreground: title text
+fg:addText(1, 0, "✨ LWE v6 DEMO ✨", "center")
+
+-- Foreground: circle and line
+fg:addGraphic("circle", {x=40, y=12, radius=5, char="O"})
+fg:addGraphic("line", {x1=1, y1=24, x2=80, y2=1, char="/"})
+
+-- Render once
+engine.renderWindow(win)
+
+-- Optional: animate (example moving dot)
+local anim = win:addLayer("Animation", 20)
+local x = 1
+while true do
+    anim:clear()
+    anim:addText(12, x, "*")
+    engine.renderWindow(win)
+    x = x + 1
+    if x > 80 then x = 1 end
+    socket.sleep(0.05)
+end
+
+--------------------------------------------------------------------
+TIP:
+- All coordinates are 1-indexed (top-left = row=1, col=1)
+- Layers render in order of zIndex (low to high)
+- Use sub-windows for modular UI sections
+- Use layer:setVisible(false) to temporarily hide a layer
+- Use engine.renderLoop(win, fps) for timed animation loops
+- Align text with "left", "center", or "right"
+
+====================================================================
+END OF REFERENCE v6
+====================================================================
